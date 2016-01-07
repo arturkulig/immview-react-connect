@@ -1,14 +1,14 @@
-var immview = require('immview');
-var Immutable = require('immutable');
+var IV = require('immview');
+var I = require('immutable');
 var React = require('react');
 var ReactDOMserver = require('react-dom/server');
 
 describe('dev environment contains', () => {
     it('immview', () => {
-        expect(immview).toBeDefined();
+        expect(IV).toBeDefined();
     });
     it('Immutable', () => {
-        expect(Immutable).toBeDefined();
+        expect(I).toBeDefined();
     });
     it('React', () => {
         expect(React).toBeDefined();

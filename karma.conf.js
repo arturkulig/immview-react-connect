@@ -20,7 +20,7 @@ module.exports = function(config) {
             //'node_modules/react/dist/react.js',
             //'node_modules/immview/dist/immview.js',
         ]).concat([
-            'tests/index.js',
+            './karma.specs.js',
         ]),
 
         // list of files to exclude
@@ -29,8 +29,8 @@ module.exports = function(config) {
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
-            //'src/index.js': ['webpack'],
-            'tests/index.js': ['webpack', 'sourcemap'],
+            //'src/karma.specs.js': ['webpack'],
+            '*.js': ['webpack', 'sourcemap'],
         },
 
         webpack: webpackConfig,
