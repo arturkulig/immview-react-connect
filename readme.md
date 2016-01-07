@@ -1,8 +1,12 @@
 #immview-react-connect
 
-Function to connect [immview](https://github.com/arturkulig/immview) Reactor (Data or View) to a React component.
+Function to connect [immview](https://github.com/arturkulig/immview) `Data` or `View` to a React component.
 
-Usage:
+##Installation
+
+	npm i immview-react-connect --save
+
+##Usage
 
 ```javascript
 var connect = require('immview-react-connect');

@@ -19,8 +19,6 @@
     "babel-preset-es2015": "^6.1.18",
     "babel-preset-react": "^6.3.13",
     "babel-preset-stage-0": "^6.3.13",
-    "immutable": "^3.7.5",
-    "immview": "^1.1.4",
     "jasmine-core": "^2.3.4",
     "karma": "^0.13.14",
     "karma-babel-preprocessor": "^6.0.1",
@@ -32,10 +30,13 @@
     "karma-sourcemap-loader": "^0.3.6",
     "karma-webpack": "^1.7.0",
     "phantomjs": "^1.9.18",
-    "react": "^0.14.5",
     "react-dom": "^0.14.5",
     "webpack": "^1.12.6",
     "webpack-dev-server": "^1.12.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "immutable": "^3.7.5",
+    "immview": "^1.1.4",
+    "react": "^0.14.0"
+  }
 }
