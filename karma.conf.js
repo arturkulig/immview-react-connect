@@ -1,6 +1,10 @@
 var webpackConfig = require('./webpack.config.js');
 
+var testFile = './karma.specs.js';
+
+webpackConfig.entry = testFile;
 webpackConfig.devtool = 'inline-source-map';
+webpackConfig.output = null;
 webpackConfig.externals = null;
 
 module.exports = function(config) {
@@ -15,12 +19,8 @@ module.exports = function(config) {
 
         // list of files / patterns to load in the browser
         files: (process.env.TRAVIS ? ['node_modules/babel-polyfill/dist/polyfill.min.js'] : []).concat([
-
-            //'node_modules/immutable/dist/immutable.js',
-            //'node_modules/react/dist/react.js',
-            //'node_modules/immview/dist/immview.js',
         ]).concat([
-            './karma.specs.js',
+            testFile,
         ]),
 
         // list of files to exclude
