@@ -1,41 +1,42 @@
-var React = require('react');
-var IV = require('immview');
-var I = require('immutable');
+import React from 'react';
+import {View} from 'immview';
+import {Iterable} from 'immutable';
 
 function connect(component,
                  sources,
                  processor) {
 
-    var ImmviewConnector = React.createClass({
+    const ImmviewConnector = React.createClass({
 
         componentWillMount() {
-            this.view = new IV.View(sources, processor);
-            this.cancelViewReaction = this.view.subscribe(() => this.forceUpdate());
+            this.view = new View(sources, processor);
+            const cancelViewReaction = this.view.subscribe(() => this.forceUpdate());
+            this.destroyConnection = () => {
+                cancelViewReaction();
+                this.view.destroy();
+            };
         },
 
         componentWillUnmount() {
-            this.view.destroy();
-            this.cancelViewReaction();
+            this.destroyConnection();
         },
 
         render() {
-
-            var viewProps = I.Iterable.isIterable(this.view.structure) ? this.view.structure.toObject() : this.view.structure;
-
-            var props = {
+            const viewData = this.view.structure;
+            const viewProps = Iterable.isIterable(viewData) ? viewData.toObject() : viewData;
+            const props = {
                 ...this.props,
                 ...viewProps,
             };
-
             if (this.view.structure) {
                 return React.createElement(
                     component,
                     props,
                     this.children
                 );
-            } else {
-                return null;
             }
+
+            return null;
         },
 
     });
@@ -43,5 +44,8 @@ function connect(component,
     return ImmviewConnector;
 
 }
+
+// for es6 import
+connect.default = connect;
 
 module.exports = connect;
