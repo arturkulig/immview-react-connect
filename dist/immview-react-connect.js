@@ -58,42 +58,52 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 	
-	var React = __webpack_require__(1);
-	var IV = __webpack_require__(2);
-	var I = __webpack_require__(3);
+	var _react = __webpack_require__(1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _immview = __webpack_require__(2);
+	
+	var _immutable = __webpack_require__(3);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function connect(component, sources, processor) {
 	
-	    var ImmviewConnector = React.createClass({
+	    var ImmviewConnector = _react2.default.createClass({
 	        displayName: 'ImmviewConnector',
 	        componentWillMount: function componentWillMount() {
 	            var _this = this;
 	
-	            this.view = new IV.View(sources, processor);
-	            this.cancelViewReaction = this.view.subscribe(function () {
+	            this.view = new _immview.View(sources, processor);
+	            var cancelViewReaction = this.view.subscribe(function () {
 	                return _this.forceUpdate();
 	            });
+	            this.destroyConnection = function () {
+	                cancelViewReaction();
+	                _this.view.destroy();
+	            };
 	        },
 	        componentWillUnmount: function componentWillUnmount() {
-	            this.view.destroy();
-	            this.cancelViewReaction();
+	            this.destroyConnection();
 	        },
 	        render: function render() {
-	
-	            var viewProps = I.Iterable.isIterable(this.view.structure) ? this.view.structure.toObject() : this.view.structure;
-	
+	            var viewData = this.view.structure;
+	            var viewProps = _immutable.Iterable.isIterable(viewData) ? viewData.toObject() : viewData;
 	            var props = _extends({}, this.props, viewProps);
-	
 	            if (this.view.structure) {
-	                return React.createElement(component, props, this.children);
-	            } else {
-	                return null;
+	                return _react2.default.createElement(component, props, this.children);
 	            }
+	
+	            return null;
 	        }
 	    });
 	
 	    return ImmviewConnector;
 	}
+	
+	// for es6 import
+	connect.default = connect;
 	
 	module.exports = connect;
 
