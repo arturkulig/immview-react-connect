@@ -75,37 +75,54 @@ return /******/ (function(modules) { // webpackBootstrap
 	        componentWillMount: function componentWillMount() {
 	            var _this = this;
 	
-	            this.view = new _immview.View(sources, processor);
-	            var cancelViewReaction = this.view.subscribe(function () {
-	                return _this.forceUpdate();
+	            this.view = new _immview.View(sources);
+	            this.updateChildProps = function (sourceData, props) {
+	                var childProps = _extends({}, props, deImmubtablize(processor ? processor(sourceData, props) : sourceData));
+	                if (childProps) {
+	                    _this.setState({ childProps: childProps });
+	                }
+	            };
+	
+	            var cancelViewReaction = this.view.subscribe(function (data) {
+	                _this.updateChildProps(data, _this.props);
 	            });
+	
 	            this.destroyConnection = function () {
-	                cancelViewReaction();
-	                _this.view.destroy();
+	                if (_this.view) {
+	                    cancelViewReaction();
+	                    _this.view.destroy();
+	                    _this.view = null;
+	                    _this.destroyConnection = null;
+	                    _this.updateChildProps = null;
+	                }
 	            };
 	        },
 	        componentWillUnmount: function componentWillUnmount() {
-	            this.destroyConnection();
+	            this.destroyConnection && this.destroyConnection();
+	        },
+	        componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+	            this.updateChildProps(this.view.read(), nextProps);
 	        },
 	        render: function render() {
-	            var viewData = this.view.structure;
-	            var viewProps = _immutable.Iterable.isIterable(viewData) ? viewData.toObject() : viewData;
-	            var props = _extends({}, this.props, viewProps);
-	            if (this.view.structure) {
-	                return _react2.default.createElement(component, props, this.children);
-	            }
-	
-	            return null;
+	            return _react2.default.createElement(component, this.state.childProps, this.state.childProps.children);
 	        }
 	    });
 	
 	    return ImmviewConnector;
 	}
 	
-	// for es6 import
-	connect.default = connect;
+	function deImmubtablize(d) {
+	    return _immutable.Iterable.isIterable(d) ? d.toObject() : d;
+	}
 	
+	// for commonjs import
 	module.exports = connect;
+	
+	// for es6 import
+	module.exports.connect = connect;
+	
+	// for es6 default import
+	module.exports.default = connect;
 
 /***/ },
 /* 1 */
