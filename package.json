@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "immutable": "^3.7.5",
-    "immview": "^1.1.4",
+    "immview": "^1.3.0",
     "react": "^0.14.0"
   }
 }

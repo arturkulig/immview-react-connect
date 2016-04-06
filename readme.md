@@ -13,15 +13,15 @@ var connect = require('immview-react-connect');
 var IV = require('immview');
 var React = require('react');
 
-var dataSource = new IV.Data({
+var dataStream = new IV.Data({
 	/* source definition */
-	dataSourceTestVar: 1
+	testKey: 1
 });
 
-function processor(data) {
+function processor(data, props) {
 	/* return transformed data, prepared for component */
 	return {
-		processedTestVar: data.get('dataSourceTestVar');
+		propKey: data.get('testKey');
 	}
 }
 
@@ -29,14 +29,14 @@ var component = React.createClass({
 	/* component definition */
 	render() {
 		return (
-			<div>{this.props.processedTestVar}</div>
+			<div>{this.props.propKey}</div>
 		)
 	}
 });
 
 var wrappedComponent = connect(
 	component,
-	dataSource,
+	dataStream,
 	processor
 );
 
