@@ -1,6 +1,6 @@
 #immview-react-connect
 
-Function to connect [immview](https://github.com/arturkulig/immview) `Data` or `View` to a React component.
+Function to connect [immview](https://github.com/arturkulig/immview) `Domain`, `Data` or `View` to a React component.
 
 ##Installation
 
@@ -8,25 +8,21 @@ Function to connect [immview](https://github.com/arturkulig/immview) `Data` or `
 
 ##Usage
 
-```javascript
-var connect = require('immview-react-connect');
-var IV = require('immview');
-var React = require('react');
+###ES6
 
-var dataStream = new IV.Data({
-	/* source definition */
-	testKey: 1
+```javascript
+import connect from 'immview-react-connect';
+import React from 'react';
+
+import dataStream from './someImmviewDataStream';
+
+/* return what should be appended to props */
+const processor = (data, props) => ({
+    propKey: data.get('testKey'),
 });
 
-function processor(data, props) {
-	/* return transformed data, prepared for component */
-	return {
-		propKey: data.get('testKey');
-	}
-}
-
-var component = React.createClass({
-	/* component definition */
+/* component definition */
+const Component = React.createClass({
 	render() {
 		return (
 			<div>{this.props.propKey}</div>
@@ -34,8 +30,44 @@ var component = React.createClass({
 	}
 });
 
+/* ... and finally combining all parts */
+const wrappedComponent = connect(
+	Component,
+	dataStream,
+	processor
+);
+
+export default wrappedComponent;
+```
+
+###ES5
+
+```javascript
+var connect = require('immview-react-connect');
+var IV = require('immview');
+var React = require('react');
+
+var dataStream = require('./someImmviewDataStream');
+
+/* return what should be appended to props */
+function processor(data, props) {
+	return {
+		propKey: data.get('testKey')
+	};
+}
+
+/* component definition */
+var Component = React.createClass({
+	render: function() {
+		return (
+			<div>{this.props.propKey}</div>
+		)
+	}
+});
+
+/* ... and finally combining all parts */
 var wrappedComponent = connect(
-	component,
+	Component,
 	dataStream,
 	processor
 );
