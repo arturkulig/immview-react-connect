@@ -1,11 +1,11 @@
-var IV = require('immview');
-var I = require('immutable');
-var React = require('react');
-var ReactDOM = require('react-dom');
-var ReactDOMserver = require('react-dom/server');
-var connect = require('../src/index.js');
+import * as IV from 'immview';
+import * as I from 'immutable';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import ReactDOMserver from 'react-dom/server';
+import connect from '../src/index.js';
 
-var testComponent = React.createClass({
+const testComponent = React.createClass({
     render() {
         return (
             <div>{this.props.testProp || 'noval'}{this.props.children}</div>
@@ -13,18 +13,18 @@ var testComponent = React.createClass({
     },
 });
 
-var testData = new IV.Data(I.Map({testField: 42}));
+const testData = new IV.Data(I.Map({ testField: 42 }));
 
 describe('connect', () => {
 
     it('with noop', () => {
 
-        var WrappedComponent = connect(
+        const WrappedComponent = connect(
             testComponent,
             testData
         );
 
-        var result = ReactDOMserver.renderToStaticMarkup(<WrappedComponent />);
+        const result = ReactDOMserver.renderToStaticMarkup(<WrappedComponent />);
 
         expect(result).toBe('<div>noval</div>');
 
@@ -32,13 +32,13 @@ describe('connect', () => {
 
     it('with Immutable.Map', () => {
 
-        var WrappedComponent = connect(
+        const WrappedComponent = connect(
             testComponent,
             testData,
             data => data.set('testProp', data.get('testField'))
         );
 
-        var result = ReactDOMserver.renderToStaticMarkup(<WrappedComponent />);
+        const result = ReactDOMserver.renderToStaticMarkup(<WrappedComponent />);
 
         expect(result).toBe('<div>42</div>');
 
@@ -46,34 +46,32 @@ describe('connect', () => {
 
     it('with Object', () => {
 
-        var WrappedComponent = connect(
+        const WrappedComponent = connect(
             testComponent,
             testData,
-            data => {
-                return {testProp: data.get('testField')};
-            }
+            data => ({ testProp: data.get('testField') })
         );
 
-        var result = ReactDOMserver.renderToStaticMarkup(<WrappedComponent />);
+        const result = ReactDOMserver.renderToStaticMarkup(<WrappedComponent />);
 
         expect(result).toBe('<div>42</div>');
 
     });
 
     it('and change data', () => {
-        var liveTestData = new IV.Data(I.Map());
+        const liveTestData = new IV.Data(I.Map());
 
-        var WrappedComponent = connect(
+        const WrappedComponent = connect(
             testComponent,
             liveTestData
         );
 
-        var tmpMount = document.createElement('DIV');
+        const tmpMount = document.createElement('DIV');
         ReactDOM.render(<WrappedComponent />, tmpMount);
 
         expect(tmpMount.innerText).toBe('noval');
 
-        liveTestData.write(I.Map({testProp: 43}));
+        liveTestData.write(I.Map({ testProp: 43 }));
 
         expect(tmpMount.innerText).toBe('43');
 
@@ -81,32 +79,45 @@ describe('connect', () => {
 
     it('passes props down', () => {
 
-        var WrappedComponent = connect(
+        const sourceData = new IV.Data(I.Map());
+        const sourceView = new IV.View(sourceData, sourceData => {
+            if (sourceData.get('ready')) {
+                return I.Map({ testProp: 45 });
+            }
+
+            return I.Map({});
+        });
+
+        const WrappedComponent = connect(
             testComponent,
-            testData
+            sourceView,
         );
 
-        var result = ReactDOMserver.renderToStaticMarkup(
-            <WrappedComponent testProp={43}/>
-        );
+        const tmpMount = document.createElement('DIV');
+        ReactDOM.render(<WrappedComponent testProp={44} />, tmpMount);
+        expect(tmpMount.innerText).toBe('44');
 
-        expect(result).toBe('<div>43</div>');
+        sourceData.write(I.Map({ ready: 1 }));
+        expect(tmpMount.innerText).toBe('45');
+
+        sourceData.write(I.Map({ ready: null }));
+        expect(tmpMount.innerText).toBe('44');
 
     });
 
     it('mixes props and source', () => {
 
-        var source = new IV.Data(I.Map({secret: 42}));
+        const source = new IV.Data(I.Map({ secret: 42 }));
 
-        var WrappedComponent = connect(
+        const WrappedComponent = connect(
             testComponent,
             source,
-            (sourceData, props) => ({testProp: sourceData.get(props.secretKey || 0)})
+            (sourceData, props) => ({ testProp: sourceData.get(props.secretKey || 0) })
         );
 
-        var setState = null;
+        let setState;
 
-        var ControllingComponent = React.createClass({
+        const ControllingComponent = React.createClass({
             render() {
                 setState = s => this.setState(s);
 
@@ -118,15 +129,16 @@ describe('connect', () => {
             },
         });
 
-        var tmpMount = document.createElement('DIV');
+        const tmpMount = document.createElement('DIV');
         ReactDOM.render(<ControllingComponent>__controlled</ControllingComponent>, tmpMount);
         expect(tmpMount.innerText).toBe('noval__controlled');
 
-        setState({secretKey: 'secret'});
+        setState({ secretKey: 'secret' });
         expect(tmpMount.innerText).toBe('42__controlled');
 
-        source.write(I.Map({secret: 43}));
+        source.write(I.Map({ secret: 43 }));
         expect(tmpMount.innerText).toBe('43__controlled');
 
     });
+
 });
