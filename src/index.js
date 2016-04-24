@@ -9,48 +9,51 @@ function connect(component,
     const ImmviewConnector = React.createClass({
         componentWillMount() {
             this.view = new View(sources);
-            this.updateChildProps = (sourceData, props) => {
-                const childProps = {
-                    ...props,
-                    ...deImmubtablize(
-                        processor
-                            ? processor(sourceData, props)
-                            : sourceData
-                    ),
-                };
-                if (childProps) {
-                    this.setState({childProps});
-                }
-            };
 
-            const cancelViewReaction = this.view.subscribe(data => {
+            this.cancelViewReaction = this.view.subscribe(data => {
                 this.updateChildProps(data, this.props);
             });
-
-            this.destroyConnection = () => {
-                if (this.view) {
-                    cancelViewReaction();
-                    this.view.destroy();
-                    this.view = null;
-                    this.destroyConnection = null;
-                    this.updateChildProps = null;
-                }
-            };
         },
 
         componentWillUnmount() {
-            this.destroyConnection && this.destroyConnection();
+            this.destroyConnection();
         },
 
         componentWillReceiveProps(nextProps) {
             this.updateChildProps(this.view.read(), nextProps);
         },
+        
+        shouldComponentUpdate(nextProps, nextState) {
+            return this.state !== nextState;
+        },
+
+        updateChildProps(sourceData, props) {
+            const processorProps = {
+                ...props,
+                ...deImmubtablize(
+                    processor
+                        ? processor(sourceData, props)
+                        : sourceData
+                ),
+            };
+            if (processorProps) {
+                this.setState({ processorProps });
+            }
+        },
+
+        destroyConnection() {
+            if (this.view) {
+                this.cancelViewReaction && this.cancelViewReaction();
+                this.cancelViewReaction = null;
+                this.view.destroy();
+                this.view = null;
+            }
+        },
 
         render() {
             return React.createElement(
                 component,
-                this.state.childProps,
-                this.state.childProps.children
+                this.state.processorProps
             );
         },
 
