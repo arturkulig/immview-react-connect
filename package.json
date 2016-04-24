@@ -8,7 +8,10 @@
     "test_once": "./node_modules/.bin/karma start --single-run",
     "start": "./node_modules/.bin/webpack --watch",
     "build": "./node_modules/.bin/webpack",
-    "preversion": "npm run build; git add -A; git commit -m \"build\";"
+    "preversion": "npm run build; git add -A; git commit -m \"build\";",
+    "fix:src": "$(npm bin)/jscs --fix src/*.js",
+    "fix:tests": "$(npm bin)/jscs --fix tests/*.js",
+    "fix": "npm run fix:src; npm run fix:tests;"
   },
   "author": "Artur Kulig",
   "license": "MIT",
@@ -31,6 +34,9 @@
     "karma-webpack": "^1.7.0",
     "phantomjs": "^1.9.18",
     "react-dom": "^0.14.5",
+    "uglify": "^0.1.5",
+    "uglify-loader": "^1.3.0",
+    "jscs": "^2.10.1",
     "webpack": "^1.12.6",
     "webpack-dev-server": "^1.12.1"
   },
