@@ -8,7 +8,6 @@
     "test_once": "./node_modules/.bin/karma start --single-run",
     "start": "./node_modules/.bin/webpack --watch",
     "build": "./node_modules/.bin/webpack",
-    "preversion": "npm run build; git add -A; git commit -m \"build\";",
     "fix:src": "$(npm bin)/jscs --fix src/*.js",
     "fix:tests": "$(npm bin)/jscs --fix tests/*.js",
     "fix": "npm run fix:src; npm run fix:tests;"
