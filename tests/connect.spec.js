@@ -1,5 +1,4 @@
 import * as IV from 'immview';
-import * as I from 'immutable';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactDOMserver from 'react-dom/server';
@@ -13,7 +12,7 @@ const testComponent = React.createClass({
     },
 });
 
-const testData = new IV.Data(I.Map({ testField: 42 }));
+const testData = new IV.Data({ testField: 42 });
 
 describe('connect', () => {
 
@@ -31,11 +30,10 @@ describe('connect', () => {
     });
 
     it('with Immutable.Map', () => {
-
         const WrappedComponent = connect(
             testComponent,
             testData,
-            data => data.set('testProp', data.get('testField'))
+            data => ({ toObject: () => ({ testProp: data.testField }) })
         );
 
         const result = ReactDOMserver.renderToStaticMarkup(<WrappedComponent />);
@@ -49,7 +47,7 @@ describe('connect', () => {
         const WrappedComponent = connect(
             testComponent,
             testData,
-            data => ({ testProp: data.get('testField') })
+            data => ({ testProp: data.testField })
         );
 
         const result = ReactDOMserver.renderToStaticMarkup(<WrappedComponent />);
@@ -59,7 +57,7 @@ describe('connect', () => {
     });
 
     it('and change data', () => {
-        const liveTestData = new IV.Data(I.Map());
+        const liveTestData = new IV.Data({});
 
         const WrappedComponent = connect(
             testComponent,
@@ -71,7 +69,7 @@ describe('connect', () => {
 
         expect(tmpMount.innerText).toBe('noval');
 
-        liveTestData.write(I.Map({ testProp: 43 }));
+        liveTestData.write({ testProp: 43 });
 
         expect(tmpMount.innerText).toBe('43');
 
@@ -79,13 +77,13 @@ describe('connect', () => {
 
     it('passes props down', () => {
 
-        const sourceData = new IV.Data(I.Map());
+        const sourceData = new IV.Data({});
         const sourceView = new IV.View(sourceData, sourceData => {
-            if (sourceData.get('ready')) {
-                return I.Map({ testProp: 45 });
+            if (sourceData.ready) {
+                return { testProp: 45 };
             }
 
-            return I.Map({});
+            return {};
         });
 
         const WrappedComponent = connect(
@@ -97,22 +95,22 @@ describe('connect', () => {
         ReactDOM.render(<WrappedComponent testProp={44} />, tmpMount);
         expect(tmpMount.innerText).toBe('44');
 
-        sourceData.write(I.Map({ ready: 1 }));
+        sourceData.write({ ready: 1 });
         expect(tmpMount.innerText).toBe('45');
 
-        sourceData.write(I.Map({ ready: null }));
+        sourceData.write({ ready: null });
         expect(tmpMount.innerText).toBe('44');
 
     });
 
     it('mixes props and source', () => {
 
-        const source = new IV.Data(I.Map({ secret: 42 }));
+        const source = new IV.Data({ secret: 42 });
 
         const WrappedComponent = connect(
             testComponent,
             source,
-            (sourceData, props) => ({ testProp: sourceData.get(props.secretKey || 0) })
+            (sourceData, props) => ({ testProp: sourceData[props.secretKey] || 0 })
         );
 
         let setState;
@@ -136,7 +134,7 @@ describe('connect', () => {
         setState({ secretKey: 'secret' });
         expect(tmpMount.innerText).toBe('42__controlled');
 
-        source.write(I.Map({ secret: 43 }));
+        source.write({ secret: 43 });
         expect(tmpMount.innerText).toBe('43__controlled');
 
     });

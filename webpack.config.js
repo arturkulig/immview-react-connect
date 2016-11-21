@@ -8,7 +8,6 @@ module.exports = {
         libraryTarget: 'umd',
     },
     externals: {
-        immutable: 'immutable',
         react: 'react',
         immview: 'immview',
     },

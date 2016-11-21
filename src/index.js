@@ -1,6 +1,5 @@
 import React from 'react';
 import {View} from 'immview';
-import {Iterable} from 'immutable';
 
 function connect(component,
                  sources,
@@ -63,7 +62,10 @@ function connect(component,
 }
 
 function deImmubtablize(d) {
-    return Iterable.isIterable(d) ? d.toObject() : d;
+    if (typeof d !== 'object' || d === null) return d;
+    // immutable.js compatibility
+    if (typeof d.toObject === 'function') return d.toObject();
+    return d;
 }
 
 // for commonjs import
