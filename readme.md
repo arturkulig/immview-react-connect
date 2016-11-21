@@ -18,14 +18,14 @@ import dataStream from './someImmviewDataStream';
 
 /* return what should be appended to props */
 const processor = (data, props) => ({
-    propKey: data.get('testKey'),
+    additionalProp: data.someProperty
 });
 
 /* component definition */
 const Component = React.createClass({
 	render() {
 		return (
-			<div>{this.props.propKey}</div>
+			<div>{this.props.additionalProp}</div>
 		)
 	}
 });
@@ -44,7 +44,6 @@ export default wrappedComponent;
 
 ```javascript
 var connect = require('immview-react-connect');
-var IV = require('immview');
 var React = require('react');
 
 var dataStream = require('./someImmviewDataStream');
@@ -52,7 +51,7 @@ var dataStream = require('./someImmviewDataStream');
 /* return what should be appended to props */
 function processor(data, props) {
 	return {
-		propKey: data.get('testKey')
+		additionalProp: data.someProperty
 	};
 }
 
@@ -60,7 +59,7 @@ function processor(data, props) {
 var Component = React.createClass({
 	render: function() {
 		return (
-			<div>{this.props.propKey}</div>
+			<div>{this.props.additionalProp}</div>
 		)
 	}
 });
