@@ -1,6 +1,6 @@
-const IV = require('immview');
-const React = require('react');
-const ReactDOMserver = require('react-dom/server');
+import * as IV from 'immview'
+import * as React from 'react'
+import * as ReactDOMserver from 'react-dom/server'
 
 describe('dev environment contains', () => {
     it('immview', () => {
@@ -15,9 +15,11 @@ describe('dev environment contains', () => {
 describe('Can test', () => {
     it('React component', () => {
         const TestComponent = React.createClass({
-            render: () => (
-                <div>42</div>
-            ),
+            render() {
+                return (
+                    <div>42</div>
+                )
+            },
         });
 
         const element = (

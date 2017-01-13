@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "target": "ES5",
+        "types": ["node", "jasmine", "react"],
+        "module": "commonjs",
+        "lib": [
+            "dom",
+            "es6",
+            "dom.iterable",
+            "es2015.promise"
+        ],
+        "experimentalDecorators": true,
+        "jsx": "react"
+    }
+}

@@ -1,2 +1,2 @@
-require('./tests/devenv.spec.js');
-require('./tests/connect.spec.js');
+require('./tests/devenv.spec');
+require('./tests/connect.spec');

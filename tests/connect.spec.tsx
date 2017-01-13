@@ -1,8 +1,16 @@
-import * as IV from 'immview';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import ReactDOMserver from 'react-dom/server';
+import { Observable } from 'immview';
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import * as ReactDOMserver from 'react-dom/server';
 import connect from '../src/index.js';
+
+class Property<T> extends Observable<T> {
+    constructor(origin: T | Observable<T>) {
+        if (origin instanceof Observable) {
+                super(origin)
+        }
+    }
+}
 
 const testComponent = React.createClass({
     render() {
