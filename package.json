@@ -7,9 +7,7 @@
     "dev": "NODE_ENV=developement ./node_modules/.bin/karma start",
     "test": "NODE_ENV=test ./node_modules/.bin/karma start --single-run",
     "build": "NODE_ENV=production ./node_modules/.bin/webpack",
-    "fix:src": "$(npm bin)/jscs --fix src/*.js",
-    "fix:tests": "$(npm bin)/jscs --fix tests/*.js",
-    "fix": "npm run fix:src; npm run fix:tests;"
+    "preversion": "npm run test && npm run build"
   },
   "author": "Artur Kulig",
   "license": "MIT",
