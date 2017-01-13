@@ -11,13 +11,11 @@ class Property<T> extends Observable<T> {
     }
 }
 
-const testComponent = React.createClass<{ testProp: number }, {}>({
-    render() {
-        return (
-            <div>{this.props.testProp || 'noval'}{this.props.children}</div>
-        )
-    },
-})
+const testComponent = (props: { testProp: number, children?: any }) => {
+    return (
+        <div>{props.testProp || 'noval'}{props.children}</div>
+    )
+}
 
 const valuesPushed = () => new Promise(resolve => dispatch(resolve))
 
@@ -70,7 +68,7 @@ describe('connect', () => {
         const WrappedComponent = connect(
             testComponent,
             source,
-            (sourceValue, props: { testProp: number}) => ({...props, ...sourceValue})
+            (sourceValue, props: { testProp: number }) => ({ ...props, ...sourceValue })
         )
 
         const tmpMount = document.createElement('DIV')
