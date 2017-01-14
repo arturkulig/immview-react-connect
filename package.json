@@ -1,6 +1,6 @@
 {
   "name": "immview-react-connect",
-  "version": "2.0.1",
+  "version": "2.0.3",
   "description": "",
   "main": "dist/immview-react-connect.js",
   "scripts": {
