@@ -2,11 +2,13 @@
   "name": "immview-react-connect",
   "version": "2.0.4",
   "description": "",
-  "main": "dist/immview-react-connect.js",
+  "main": "/dist/immview-react-connect.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "NODE_ENV=developement ./node_modules/.bin/karma start",
     "test": "NODE_ENV=test ./node_modules/.bin/karma start --single-run",
-    "build": "NODE_ENV=production ./node_modules/.bin/webpack",
+    "declarations": "rm -rf ./dist/*.d.ts; tsc --project ./tsconfig.declarations.json; rm -rf ./dist/*.spec.d.ts; rm -rf ./tsc_tmp_output",
+    "build": "NODE_ENV=production ./node_modules/.bin/webpack && npm run declarations",
     "preversion": "npm run test && npm run build"
   },
   "author": "Artur Kulig",
