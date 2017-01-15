@@ -2,7 +2,7 @@
   "name": "immview-react-connect",
   "version": "2.0.5",
   "description": "",
-  "main": "/dist/immview-react-connect.js",
+  "main": "./dist/immview-react-connect.js",
   "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "NODE_ENV=developement ./node_modules/.bin/karma start",
