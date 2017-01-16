@@ -61,9 +61,6 @@ function connect<T, U, V extends {}>
                         this.state.sourceValue || {}
                     )
                 }) as V
-            if (typeof component === 'function') {
-                return (component as React.StatelessComponent<V>)(nextProps)
-            }
             return React.createElement(
                 component as React.ComponentClass<V>,
                 nextProps
