@@ -24,7 +24,6 @@ function connect<T, U, V extends {}>
 
     source.subscribe(value => {
         instances.forEach(instance => {
-            console.log('TEST DATA PUSH')
             instance.setState({ sourceReceived: true, sourceValue: value })
         })
     });
