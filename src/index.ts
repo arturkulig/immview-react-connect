@@ -50,16 +50,8 @@ function connect<T, U, V extends {}>
                 this.state = { sourceReceived: true, sourceValue: source.previous() }
             }
             const nextProps: V = connector
-                ? ({
-                    ...(
-                        connector(this.state.sourceValue, this.props) || {}
-                    )
-                }) as V
-                : ({
-                    ...(
-                        this.state.sourceValue || {}
-                    )
-                }) as V
+                ? (connector(this.state.sourceValue, this.props) || {}) as V
+                : (this.state.sourceValue || {}) as V
             return React.createElement(
                 component as React.ComponentClass<V>,
                 nextProps
