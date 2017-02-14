@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Observable } from 'immview';
+import { Observable, NO_VALUE } from 'immview';
 
 function connect
     <SourceT extends {}>
@@ -46,8 +46,10 @@ function connect<T, U, V extends {}>
 
         render(this: React.Component<T, { sourceReceived: boolean, sourceValue?: U }>) {
             if (!this.state.sourceReceived) {
-                if (source.previous() === undefined) return null
-                this.state = { sourceReceived: true, sourceValue: source.previous() }
+                const previous = source.previous()
+                if (source.previous() === NO_VALUE) return null
+                const previousWithValue = previous as U
+                this.state = { sourceReceived: true, sourceValue: previousWithValue }
             }
             const nextProps: V = connector
                 ? (connector(this.state.sourceValue, this.props) || {}) as V
