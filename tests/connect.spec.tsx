@@ -1,15 +1,8 @@
-import { Observable, dispatch } from 'immview'
+import { Atom, dispatch } from 'immview'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import * as ReactDOMserver from 'react-dom/server'
 import connect from '../src/index'
-
-class Property<T> extends Observable<T> {
-    constructor(value: T) {
-        super()
-        this.lastValue = value
-    }
-}
 
 const testComponent = (props: { testProp: number, children?: any }) => {
     return (
@@ -23,7 +16,7 @@ describe('connect', () => {
     it('with noop', async () => {
         const WrappedComponent = connect(
             testComponent,
-            new Property({ testField: 42 }),
+            new Atom({ testField: 42 }),
             v => null
         )
 
@@ -35,7 +28,7 @@ describe('connect', () => {
     it('with Object', async () => {
         const WrappedComponent = connect(
             testComponent,
-            new Property({ testField: 42 }),
+            new Atom({ testField: 42 }),
             data => ({ testProp: data.testField })
         )
 
@@ -45,7 +38,7 @@ describe('connect', () => {
     })
 
     it('and change data', async () => {
-        const liveTestData = new Property<{ testProp: number }>({ testProp: undefined })
+        const liveTestData = new Atom<{ testProp: number }>({ testProp: undefined })
 
         const WrappedComponent = connect(
             testComponent,
@@ -63,7 +56,7 @@ describe('connect', () => {
     })
 
     it('passes props down', async () => {
-        const source = new Property<{ testProp?: number }>({})
+        const source = new Atom<{ testProp?: number }>({ testProp: undefined })
 
         const WrappedComponent = connect(
             testComponent,
@@ -87,7 +80,7 @@ describe('connect', () => {
 
     it('mixes props and source', async () => {
         type SourceT = { secret: number }
-        const source = new Property<SourceT>({ secret: 42 })
+        const source = new Atom<SourceT>({ secret: 42 })
 
         const WrappedComponent = connect(
             testComponent,

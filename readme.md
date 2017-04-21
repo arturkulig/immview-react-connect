@@ -1,6 +1,6 @@
 # immview-react-connect
 
-Function to connect [immview](https://github.com/arturkulig/immview) `Observable` to a React component.
+Function to connect [immview](https://github.com/arturkulig/immview) an `Atom` or `Observable` to a React component.
 
 ## Installation
 

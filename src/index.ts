@@ -1,36 +1,34 @@
 import * as React from 'react';
-import { Observable, NO_VALUE } from 'immview';
+import { OpStream } from 'immview';
 
 function connect
     <SourceT extends {}>
     (
     component: React.ComponentClass<SourceT> | React.StatelessComponent<SourceT>,
-    source: Observable<SourceT>
+    source: OpStream<SourceT>
     ): React.ComponentClass<SourceT>
 function connect
     <OriginalPropsT extends {}, SourceT extends {}, ResultPropsT extends {}>
     (
     component: React.ComponentClass<ResultPropsT> | React.StatelessComponent<ResultPropsT>,
-    source: Observable<SourceT>,
+    source: OpStream<SourceT>,
     connector?: (sourceValue: SourceT, props: OriginalPropsT) => ResultPropsT
     ): React.ComponentClass<OriginalPropsT>
 function connect<T, U, V extends {}>
     (
     component: React.ComponentClass<V> | React.StatelessComponent<V>,
-    source: Observable<U>,
+    source: OpStream<U>,
     connector?: (sourceValue: U, props: T) => V
     ): React.ComponentClass<T> {
-    const instances: React.Component<T, { sourceReceived: boolean, sourceValue?: U }>[] = []
+    const instances: React.Component<T, { sourceValue?: U }>[] = []
 
     source.subscribe(value => {
         instances.forEach(instance => {
-            instance.setState({ sourceReceived: true, sourceValue: value })
+            instance.forceUpdate()
         })
     });
-
     class ImmviewConnector extends React.Component<T, { sourceReceived: boolean, sourceValue?: U }>{
         state = { sourceReceived: false }
-
         componentWillMount() {
             instances.push(this)
         }
@@ -43,15 +41,10 @@ function connect<T, U, V extends {}>
         }
 
         render(this: React.Component<T, { sourceReceived: boolean, sourceValue?: U }>) {
-            if (!this.state.sourceReceived) {
-                const previous = source.previous()
-                if (source.previous() === NO_VALUE) return null
-                const previousWithValue = previous as U
-                this.state = { sourceReceived: true, sourceValue: previousWithValue }
-            }
+            if (!source.hasRef()) return null
             const nextProps: V = connector
-                ? (connector(this.state.sourceValue, this.props) || {}) as V
-                : (this.state.sourceValue || {}) as V
+                ? (connector(source.deref(), this.props) || {}) as V
+                : (source.deref() || {}) as V
             return React.createElement(
                 component as React.ComponentClass<V>,
                 nextProps
