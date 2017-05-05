@@ -28,21 +28,19 @@ function connect<T, U, V extends {}>
         })
     });
 
-    const ImmviewConnector = React.createClass<T, { sourceReceived: boolean, sourceValue?: U }>({
-        getInitialState() {
-            return { sourceReceived: false }
-        },
+    class ImmviewConnector extends React.Component<T, { sourceReceived: boolean, sourceValue?: U }>{
+        state = { sourceReceived: false }
 
         componentWillMount() {
             instances.push(this)
-        },
+        }
 
         componentWillUnmount() {
             const pos = instances.indexOf(this)
             if (pos >= 0) {
                 instances.splice(pos, 1)
             }
-        },
+        }
 
         render(this: React.Component<T, { sourceReceived: boolean, sourceValue?: U }>) {
             if (!this.state.sourceReceived) {
@@ -58,9 +56,8 @@ function connect<T, U, V extends {}>
                 component as React.ComponentClass<V>,
                 nextProps
             )
-        },
-
-    });
+        }
+    }
 
     return ImmviewConnector;
 }

@@ -14,13 +14,13 @@ describe('dev environment contains', () => {
 
 describe('Can test', () => {
     it('React component', () => {
-        const TestComponent = React.createClass({
+        class TestComponent extends React.Component<{}, {}> {
             render() {
                 return (
                     <div>42</div>
                 )
-            },
-        });
+            }
+        }
 
         const element = (
             <TestComponent></TestComponent>

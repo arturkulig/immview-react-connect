@@ -63,7 +63,7 @@ describe('connect', () => {
     })
 
     it('passes props down', async () => {
-        const source = new Property<{ testProp: number }>({ testProp: undefined })
+        const source = new Property<{ testProp?: number }>({})
 
         const WrappedComponent = connect(
             testComponent,
@@ -80,7 +80,7 @@ describe('connect', () => {
         await valuesPushed()
         expect(tmpMount.innerText).toBe('45')
 
-        source.next({ testProp: undefined })
+        source.next({})
         await valuesPushed()
         expect(tmpMount.innerText).toBe('44')
     })
@@ -97,8 +97,8 @@ describe('connect', () => {
 
         let setState
 
-        const ControllingComponent = React.createClass({
-            getInitialState: () => ({}),
+        class ControllingComponent extends React.Component<{}, { secretKey?: string }>{
+            state = { secretKey: null }
 
             render() {
                 setState = s => this.setState(s)
@@ -108,8 +108,8 @@ describe('connect', () => {
                         {this.props.children}
                     </WrappedComponent>
                 )
-            },
-        })
+            }
+        }
 
         const tmpMount = document.createElement('DIV')
         ReactDOM.render(<ControllingComponent>__controlled</ControllingComponent>, tmpMount)
