@@ -4,8 +4,8 @@ var testFile = './karma.specs.js';
 
 webpackConfig.entry = testFile;
 webpackConfig.devtool = 'inline-source-map';
-webpackConfig.output = null;
-webpackConfig.externals = null;
+delete webpackConfig.output
+delete webpackConfig.externals
 
 module.exports = function(config) {
     config.set({

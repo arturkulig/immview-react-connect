@@ -1,6 +1,6 @@
 const path = require('path')
 const webpack = require('webpack')
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 
 const config = {
     entry: path.resolve(__dirname, 'src/index.ts'),

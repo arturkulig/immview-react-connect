@@ -56,7 +56,7 @@ describe('connect', () => {
     })
 
     it('passes props down', async () => {
-        const source = new Atom<{ testProp?: number }>({ testProp: undefined })
+        const source = new Atom<{ testProp?: number }>({})
 
         const WrappedComponent = connect(
             testComponent,
