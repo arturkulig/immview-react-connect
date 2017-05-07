@@ -2,7 +2,7 @@ import { Atom, dispatch } from 'immview'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import * as ReactDOMserver from 'react-dom/server'
-import connect from '../src/index'
+import { connect } from '../src/index'
 
 const testComponent = (props: { testProp: number, children?: any }) => {
     return (
