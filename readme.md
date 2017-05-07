@@ -1,6 +1,9 @@
 # immview-react-connect
 
-Function to connect [immview](https://github.com/arturkulig/immview) an `Atom` or `Observable` to a React component.
+Functions to connect [immview](https://github.com/arturkulig/immview) an `Atom` or `Observable` to a React component.
+
+`connect` is best for connecting many instances of the component to a single source
+`component` is best for more complex scenarios like connecting to multiple source or where a component instance is meant to make more calculations.
 
 ## Installation
 
@@ -8,27 +11,22 @@ Function to connect [immview](https://github.com/arturkulig/immview) an `Atom` o
 npm i immview-react-connect --save
 ```
 
-## Usage
+## `connect` usage
 
-### TypeScript+JSX
-```typescript
-import { Observable } from 'immview'
+```javascript
+import { Atom } from 'immview'
 import connect from 'immview-react-connect'
 import * as React from 'react'
 
-const Cave = new Observable<{[id: string]: string}>(
-    observer => {
-        observer.next({ 'open sesame': 'treasure' })
-    }
-)
+const Vault$ = new Atom({ 'open sesame': 'treasure' })
 
 const SecretChest = connect(
     ({ children }) => (
         <div>{children}</div>
     ),
-    Cave,
-    (CaveValue, props: {secretKey: string}) => ({
-        children: CaveValue[props.secretKey]
+    Vault$,
+    (Vault, props) => ({
+        children: Vault[props.secretKey]
     })
 )
 
@@ -37,67 +35,28 @@ const SecretDiscovererWithKey = () => (
 )
 ```
 
-### ES6+JSX
+## `component` usage
 
 ```javascript
-import { Observable } from 'immview'
-import connect from 'immview-react-connect'
+import { Atom, Combine } from 'immview'
+import component from 'immview-react-connect'
 import * as React from 'react'
 
-const Cave = new Observable(
-    observer => {
-        observer.next({ 'open sesame': 'treasure' })
-    }
-)
+const Vault$ = new Atom({ 'open sesame': 'treasure' })
 
-const SecretChest = connect(
-    ({ children }) => (
-        <div>{children}</div>
-    ),
-    Cave,
-    (CaveValue, props) => ({
-        children: CaveValue[props.secretKey]
-    })
-)
-
-const SecretDiscovererWithKey = () => (
-    <SecretChest secretKey="open sesame" />
-)
-```
-
-### ES5
-
-```javascript
-const { Observable } = require('immview')
-const connect = require('immview-react-connect')
-const React = require('react')
-
-const Cave = new Observable(
-    function (observer) => {
-        observer.next({ 'open sesame': 'treasure' })
-    }
-)
-
-const SecretChest = connect(
-    function (props) {
-        return React.createElement(
-            "div",
-            {},
-            props.children
+const SecretChest = component(
+    props$ =>
+        new Combine({
+            props: props$,
+            vault: Vault$,
+        }).map(
+            ({props, vault}) => (
+                <div>{vault[props.secretKey]}</div>
+            )
         )
-    },
-    Cave,
-    function (CaveValue, props) {
-        return {
-            children: CaveValue[props.secretKey]
-        }
-    }
 )
 
-const SecretDiscovererWithKey = function () {
-    return React.createElement(
-        SecretChest
-        { secretKey: 'open sesame' }
-    )
-}
+const SecretDiscovererWithKey = () => (
+    <SecretChest secretKey="open sesame" />
+)
 ```
