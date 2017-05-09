@@ -15,7 +15,7 @@ npm i immview-react-connect --save
 
 ```javascript
 import { Atom } from 'immview'
-import connect from 'immview-react-connect'
+import { connect } from 'immview-react-connect'
 import * as React from 'react'
 
 const Vault$ = new Atom({ 'open sesame': 'treasure' })
@@ -39,7 +39,7 @@ const SecretDiscovererWithKey = () => (
 
 ```javascript
 import { Atom, Combine } from 'immview'
-import component from 'immview-react-connect'
+import { component } from 'immview-react-connect'
 import * as React from 'react'
 
 const Vault$ = new Atom({ 'open sesame': 'treasure' })
