@@ -2,17 +2,17 @@ import * as React from 'react'
 import { Atom, OpStream, dispatcher } from 'immview'
 
 class StateAtom<T extends Object> extends Atom<T> {
-    next(valueOrProducer: T | ((p: T) => T)) {
+    next(valueOrProducer: Partial<T> | ((p: T) => Partial<T>)) {
         const producer =
             typeof valueOrProducer === 'function'
                 ? valueOrProducer
                 : ((_: T) => valueOrProducer)
         Atom.prototype.next.call(
             this,
-            {
-                ...this.deref() as Object,
-                ...producer(this.deref()) as Object
-            }
+            prevState => ({
+                ...prevState as Object,
+                ...producer(prevState) as any as Object
+            })
         )
     }
 }
