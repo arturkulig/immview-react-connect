@@ -11,6 +11,35 @@ Functions to connect [immview](https://github.com/arturkulig/immview) an `Atom` 
 npm i immview-react-connect --save
 ```
 
+## `component` usage
+
+```javascript
+import { Atom, Combine } from 'immview'
+import { component } from 'immview-react-connect'
+import * as React from 'react'
+
+const Chest = component(
+    (props$, state$) => (
+        state$.next({ 'open': 'trea' }),
+        state$.next({ 'sesame' : 'sure' }),
+        new Combine({
+            props: props$,
+            state: state$,
+        }).map(
+            ({props, vault}) => (
+                <div>{
+                    props.key.split('').map(key => state[key]).join('')
+                }</div>
+            )
+        )
+    )
+)
+
+const SecretDiscovererWithKey = () => (
+    <Chest key="open sesame" />
+)
+```
+
 ## `connect` usage
 
 ```javascript
@@ -28,32 +57,6 @@ const SecretChest = connect(
     (Vault, props) => ({
         children: Vault[props.secretKey]
     })
-)
-
-const SecretDiscovererWithKey = () => (
-    <SecretChest secretKey="open sesame" />
-)
-```
-
-## `component` usage
-
-```javascript
-import { Atom, Combine } from 'immview'
-import { component } from 'immview-react-connect'
-import * as React from 'react'
-
-const Vault$ = new Atom({ 'open sesame': 'treasure' })
-
-const SecretChest = component(
-    props$ =>
-        new Combine({
-            props: props$,
-            vault: Vault$,
-        }).map(
-            ({props, vault}) => (
-                <div>{vault[props.secretKey]}</div>
-            )
-        )
 )
 
 const SecretDiscovererWithKey = () => (

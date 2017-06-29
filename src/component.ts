@@ -1,27 +1,43 @@
 import * as React from 'react'
-import { Atom, OpStream } from 'immview'
+import { Atom, OpStream, dispatcher } from 'immview'
+
+class StateAtom<T extends Object> extends Atom<T> {
+    next(valueOrProducer: T | ((p: T) => T)) {
+        const producer =
+            typeof valueOrProducer === 'function'
+                ? valueOrProducer
+                : ((_: T) => valueOrProducer)
+        Atom.prototype.next.call(
+            this,
+            {
+                ...this.deref() as Object,
+                ...producer(this.deref()) as Object
+            }
+        )
+    }
+}
 
 export default function component<PropsT extends {}>(getStream: (props$: Atom<PropsT>) => OpStream<JSX.Element>): React.ComponentClass<PropsT>
 export default function component<PropsT extends {}, StateT>(getStream: (props$: Atom<PropsT>, state$: Atom<StateT>) => OpStream<JSX.Element>): React.ComponentClass<PropsT>
 export default function component<PropsT extends {}, StateT>(getStream: (props$: Atom<PropsT>, state$: Atom<StateT>) => OpStream<JSX.Element>) {
     return class IVComponent extends React.Component<PropsT, { view: JSX.Element }> {
         props$: Atom<PropsT>
-        state$: Atom<StateT>
+        state$: StateAtom<StateT>
         view$: OpStream<JSX.Element>
         dead = true
 
         constructor(props) {
             super(props)
-            this.props$ = new Atom(props)
-            this.state$ = new Atom(null)
-            this.view$ = getStream(this.props$, this.state$)
             this.state = {
-                view: this.view$.deref()
+                view: null
             }
-            this.view$.subscribe(view => {
-                if (this.dead) return
-                this.setState({ view })
-            })
+            this.props$ = new Atom(props)
+            this.state$ = new StateAtom(null)
+            if (dispatcher.isRunning) {
+                Promise.resolve().then(this.initialize)
+            } else {
+                this.initialize()
+            }
         }
 
         componentWillReceiveProps(nextProps) {
@@ -38,9 +54,20 @@ export default function component<PropsT extends {}, StateT>(getStream: (props$:
 
         componentWillUnmount() {
             this.dead = true
-            this.view$.complete()
+            this.view$ && this.view$.complete()
             this.props$.complete()
             this.state$.complete()
+        }
+
+        initialize = () => {
+            this.view$ = getStream(this.props$, this.state$)
+            this.view$.subscribe(view => {
+                if (this.dead) {
+                    this.state = { view }
+                } else {
+                    this.setState({ view })
+                }
+            })
         }
 
         render() {
