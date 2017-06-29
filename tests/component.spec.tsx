@@ -38,7 +38,7 @@ describe('component', () => {
         })
         it('maintains state', () => {
             let state$$ = null
-            const View = component<any, { key: string }>(
+            const View = component<any, { key: string, irrelevant: number }>(
                 (props$, state$) =>
                     (
                         state$$ = state$,

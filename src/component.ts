@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Atom, OpStream, dispatcher } from 'immview'
 
-class StateAtom<T extends Object> extends Atom<T> {
+export class StateAtom<T extends Object> extends Atom<T> {
     next(valueOrProducer: Partial<T> | ((p: T) => Partial<T>)) {
         const producer =
             typeof valueOrProducer === 'function'
@@ -18,8 +18,8 @@ class StateAtom<T extends Object> extends Atom<T> {
 }
 
 export default function component<PropsT extends {}>(getStream: (props$: Atom<PropsT>) => OpStream<JSX.Element>): React.ComponentClass<PropsT>
-export default function component<PropsT extends {}, StateT>(getStream: (props$: Atom<PropsT>, state$: Atom<StateT>) => OpStream<JSX.Element>): React.ComponentClass<PropsT>
-export default function component<PropsT extends {}, StateT>(getStream: (props$: Atom<PropsT>, state$: Atom<StateT>) => OpStream<JSX.Element>) {
+export default function component<PropsT extends {}, StateT>(getStream: (props$: Atom<PropsT>, state$: StateAtom<StateT>) => OpStream<JSX.Element>): React.ComponentClass<PropsT>
+export default function component<PropsT extends {}, StateT>(getStream: (props$: Atom<PropsT>, state$: StateAtom<StateT>) => OpStream<JSX.Element>) {
     return class IVComponent extends React.Component<PropsT, { view: JSX.Element }> {
         props$: Atom<PropsT>
         state$: StateAtom<StateT>
