@@ -4,9 +4,12 @@ import * as ReactDOM from 'react-dom'
 import * as ReactDOMserver from 'react-dom/server'
 import { component } from '../src/index'
 
-const testComponent = (props: { testProp: number, children?: any }) => {
+const testComponent = (props: { testProp: number; children?: any }) => {
     return (
-        <div>{props.testProp || 'noval'}{props.children}</div>
+        <div>
+            {props.testProp || 'noval'}
+            {props.children}
+        </div>
     )
 }
 
@@ -21,8 +24,12 @@ describe('component', () => {
             expect(result).toBe('<div>42</div>')
         })
         it('taking props as a stream', () => {
-            const View = component<{ testProp: number }>(props$ => props$.map(testComponent))
-            const result = ReactDOMserver.renderToStaticMarkup(<View testProp={42} />)
+            const View = component<{ testProp: number }>(props$ =>
+                props$.map(testComponent)
+            )
+            const result = ReactDOMserver.renderToStaticMarkup(
+                <View testProp={42} />
+            )
             expect(result).toBe('<div>42</div>')
         })
     })
@@ -38,16 +45,16 @@ describe('component', () => {
         })
         it('maintains state', () => {
             let state$$ = null
-            const View = component<any, { key: string, irrelevant: number }>(
-                (props$, state$) =>
-                    (
-                        state$$ = state$,
-                        state$.next({ key: null }),
-                        new Combine({ props: props$, state: state$ })
-                            .map(({ props, state }) => (
-                                <div>{props[state.key] || 'none'}</div>
-                            ))
+            const View = component<any, { key: string; irrelevant: number }>(
+                (props$, state$) => (
+                    (state$$ = state$),
+                    state$.next({ key: null }),
+                    new Combine({ props: props$, state: state$ }).map(
+                        ({ props, state }) => (
+                            <div>{props[state.key] || 'none'}</div>
+                        )
                     )
+                )
             )
             const hook = document.createElement('div')
             ReactDOM.render(<View details="devil" />, hook)
@@ -57,16 +64,12 @@ describe('component', () => {
         })
         it('applies to state', () => {
             let state$$ = null
-            const View = component<{}, { chest: string, key: string }>(
-                (_, state$) =>
-                    (
-                        state$$ = state$,
-                        state$.next({ chest: null, key: null }),
-                        state$
-                            .map((state) => (
-                                <div>{state[state.key] || 'none'}</div>
-                            ))
-                    )
+            const View = component<{}, { chest: string; key: string }>(
+                (_, state$) => (
+                    (state$$ = state$),
+                    state$.next({ chest: null, key: null }),
+                    state$.map(state => <div>{state[state.key] || 'none'}</div>)
+                )
             )
             const hook = document.createElement('div')
 
@@ -79,10 +82,9 @@ describe('component', () => {
         })
         it('taking props as a stream', () => {
             let setState
-            const View =
-                component<{ testProp: number }>(
-                    props$ => props$.map(testComponent)
-                )
+            const View = component<{ testProp: number }>(props$ =>
+                props$.map(testComponent)
+            )
             class Mount extends React.Component<{}, { testProp: number }> {
                 state = { testProp: 42 }
                 constructor(props) {
@@ -100,29 +102,60 @@ describe('component', () => {
             expect(hook.innerText).toBe('43')
         })
         it('state$.next always gets applied immediately', done => {
-            const View = component<{}, { chest: string, key: string }>(
-                (_, state$) =>
-                    (
-                        state$.next({ chest: 'treasure', key: 'chest' }),
-                        expect(state$.deref()[state$.deref().key]).toBe('treasure'),
-                        state$
-                            .map((state) => (
-                                expect(state[state.key]).toBe('treasure'),
-                                <div>{state[state.key] || 'none'}</div>
-                            ))
+            const View = component<{}, { chest: string; key: string }>(
+                (_, state$) => (
+                    state$.next({ chest: 'treasure', key: 'chest' }),
+                    expect(state$.deref()[state$.deref().key]).toBe('treasure'),
+                    state$.map(
+                        state => (
+                            expect(state[state.key]).toBe('treasure'),
+                            <div>{state[state.key] || 'none'}</div>
+                        )
                     )
+                )
             )
             const hook = document.createElement('div')
             dispatch(() => {
                 try {
                     ReactDOM.render(<View />, hook)
-                } catch (e) { done.fail(e) }
+                } catch (e) {
+                    done.fail(e)
+                }
             })
             Promise.resolve().then(() => {
                 try {
                     expect(hook.innerText).toBe('treasure')
                     done()
-                } catch (e) { done.fail(e) }
+                } catch (e) {
+                    done.fail(e)
+                }
+            })
+        })
+        it('- component is not calculated if already unmounted', done => {
+            const View = component<{}, {}>(
+                (_, state$) => (
+                    state$.next({}),
+                    expect({ calculated: true }).toEqual({ calculated: false }),
+                    state$.map(() => null)
+                )
+            )
+            class App extends React.Component {
+                state = { stage: 0 }
+                componentDidMount() {
+                    this.setState({ stage: 1 })
+                }
+                render() {
+                    return { 0: <View />, 1: null }[this.state.stage]
+                }
+            }
+            const hook = document.createElement('div')
+            dispatch(() => {
+                try {
+                    ReactDOM.render(<App />, hook)
+                    done()
+                } catch (e) {
+                    done.fail(e)
+                }
             })
         })
     })

@@ -11,9 +11,9 @@
             "esnext.asynciterable"
         ],
         "experimentalDecorators": true,
-        "jsx": "react"
+        "jsx": "react",
+        "declaration": true,
+        "outDir": "./dist"
     },
-    "include": [
-        "./src/**/*.ts"
-    ]
+    "include": ["./src/*.ts"]
 }

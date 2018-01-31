@@ -6,21 +6,33 @@ export class StateAtom<T extends Object> extends Atom<T> {
         const producer =
             typeof valueOrProducer === 'function'
                 ? valueOrProducer
-                : ((_: T) => valueOrProducer)
-        Atom.prototype.next.call(
-            this,
-            prevState => ({
-                ...prevState as Object,
-                ...producer(prevState) as any as Object
-            })
-        )
+                : (_: T) => valueOrProducer
+        Atom.prototype.next.call(this, prevState => ({
+            ...(prevState as Object),
+            ...((producer(prevState) as any) as Object)
+        }))
     }
 }
 
-export default function component<PropsT extends {}>(getStream: (props$: Atom<PropsT>) => OpStream<JSX.Element>): React.ComponentClass<PropsT>
-export default function component<PropsT extends {}, StateT>(getStream: (props$: Atom<PropsT>, state$: StateAtom<StateT>) => OpStream<JSX.Element>): React.ComponentClass<PropsT>
-export default function component<PropsT extends {}, StateT>(getStream: (props$: Atom<PropsT>, state$: StateAtom<StateT>) => OpStream<JSX.Element>) {
-    return class IVComponent extends React.Component<PropsT, { view: JSX.Element }> {
+export default function component<PropsT extends {}>(
+    getStream: (props$: Atom<PropsT>) => OpStream<JSX.Element>
+): React.ComponentClass<PropsT>
+export default function component<PropsT extends {}, StateT>(
+    getStream: (
+        props$: Atom<PropsT>,
+        state$: StateAtom<StateT>
+    ) => OpStream<JSX.Element>
+): React.ComponentClass<PropsT>
+export default function component<PropsT extends {}, StateT>(
+    getStream: (
+        props$: Atom<PropsT>,
+        state$: StateAtom<StateT>
+    ) => OpStream<JSX.Element>
+) {
+    return class IVComponent extends React.Component<
+        PropsT,
+        { view: JSX.Element }
+    > {
         props$: Atom<PropsT>
         state$: StateAtom<StateT>
         view$: OpStream<JSX.Element>
@@ -60,6 +72,9 @@ export default function component<PropsT extends {}, StateT>(getStream: (props$:
         }
 
         initialize = () => {
+            if (this.props$.closed || this.state$.closed) {
+                return
+            }
             this.view$ = getStream(this.props$, this.state$)
             this.view$.subscribe(view => {
                 if (this.dead) {
